@@ -1,3 +1,5 @@
+rm(list=ls())
+
 library(survival)
 library(ggplot2)
 library(dplyr)
@@ -65,6 +67,7 @@ survdata <- data.frame(
     names(survivaltable_latest$strata), 
     survivaltable_latest$strata
   )
+  ,time = survivaltable_latest$time
 ) %>% 
   mutate(
     strata = as.numeric(gsub("^.*(.+?)$", "\\1",strata))
