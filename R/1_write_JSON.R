@@ -26,3 +26,12 @@ extrarow <- data.frame(
 survdata <- rbind(extrarow, survdata)
 
 writeLines(paste0("var jsondata = ", toJSON(survdata)), "data/survivaldata.js")
+
+fondval <- read.table("F:/20-Linje lokalt/26-Analysavd/20-Statistik/69-Statistikbeställningar/Premiepension/Utredning Stefan Lundbergh/Avkastning_fonder.txt",
+                      header = TRUE
+)
+
+?SEKTORTILLHORIGH
+?NIVAHOGSTAUTB
+?CIVILSTANDSTYP
+gg <- NIVAHOGSTAUTB(2013)
