@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Patchspeed</title>
+	<meta name="author" content="perwim" />
+	<meta name="description" content="Patchspeed" />
+	<meta name="keywords"  content="Patchspeed" />
+	<meta name="Resource-type" content="Document" />
+
+	<link rel="stylesheet" href="src/bootstrap.3.3.7/css/bootstrap.min.css">
+
+	<!-- PM fonter etc -->
+	<link rel="stylesheet" href="https://www.pensionsmyndigheten.se/etc/clientlibs/pm-framework.40433ce8c29a09bb9496c4a6c555bd77.css" type="text/css">
+	<script type="text/javascript" src="https://www.pensionsmyndigheten.se/etc/clientlibs/pm-modernizr.319f35cfb78f704d1547680c7318ead7.js"></script>
+	<link rel="stylesheet" href="https://www.pensionsmyndigheten.se/etc/clientlibs/pm-mainsite.f69f79a0acf3afa62dce624d26d560d7.css" type="text/css">
+
+	<script src="src/jquery-3.1.1.min.js"></script>
+	<script src="src/d3v4/d3.min.js"></script>
+	<script src="data/survivaldata.js"></script>
+	<script src="src/bootstrap.3.3.7/js/bootstrap.min.js"></script>
+
+	<script type="text/javascript">
+	</script>
+
+<style>
+@font-face {
+    font-family: pm-icons;
+    src: url(resources/fonts/pm-icons.woff) format("woff"), url(resources/fonts/pm-icons.ttf) format("truetype");
+}
+
+@font-face {
+    font-family: Pensio;
+    src: url(resources/fonts/PensioSans-Normal.woff2) format("woff2"), url(resources/fonts/PensioSans-Normal.woff) format("woff"), url(resources/fonts/PensioSans-Normal.ttf) format("truetype");
+}
+
+@font-face {
+    font-family: Pensio;
+    font-weight: 700;
+    src: url(resources/fonts/PensioSans-Medium.woff2) format("woff2"), url(resources/fonts/PensioSans-Medium.woff) format("woff"), url(resources/fonts/PensioSans-Medium.ttf) format("truetype");
+}
+
+div {
+    font-family: Pensio;
+}
+
+h1 {
+    font-family: Pensio;
+}
+
+p{
+	color: #181818;
+}
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+.overlay {
+  fill: none;
+  pointer-events: all;
+}
+
+.focus circle {
+  fill: #F1F3F3;
+  stroke: #6F257F;
+  stroke-width: 5px;
+}
+  
+.hover-line {
+  stroke: #6F257F;
+  stroke-width: 2px;
+  stroke-dasharray: 3,3;
+}
+</style>
+</head>
+<body>
+
+<div class = "col-md-10 col-md-offset-1" id="fullpage">
+  <!-- // first row -->
+	<div class = "col-md-6" id = "panel1"> </div>
+	<div class = "col-md-6" id = "panel2"> </div>
+
+	<!-- second row -->
+	<div class = "col-md-6" id = "panel3"> </div>
+	<div class = "col-md-6" id = "panel4"> </div>
+</div>
+
+</body>
+
+
+<script>
+
+  var margin = {top: 33, left: 40, right: 30, bottom: 33},
+      width  = 960 - margin.left - margin.right,
+      height = 500  - margin.top  - margin.bottom
+
+  var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+  var x = d3.scaleLinear()
+      .domain([0,100])
+      .range ([0,width])
+      .clamp(true),
+    y = d3.scaleLinear().range([height, 0]),
+    z = d3.scaleOrdinal(d3.schemeCategory10);
+
+	var line = d3.line()
+	    .curve(d3.curveBasis)
+	    .x(function(d) { return x(d.time); })
+	    .y(function(d) { return y(d.surv); });
+
+	var bisectDate = d3.bisector(function(d) { return d.time; }).left;
+
+	 // kom ihåg att lägga data på brett format 
+	var stratas = ["strata_1", "strata_2", "strata_3", "strata_4"].map(function(strata) {
+		    return {
+		      id: strata,
+		      vals: jsondata.map(function(d) {
+
+		      	if( typeof d[strata] == "undefined"){
+		      		return undefined
+		      	}else{
+		        return {time: d.time, surv: d[strata]};
+		    	}
+
+		      })
+		    };
+		  });
+
+	stratas.forEach(function(d){
+		d.vals = d.vals.filter(function(d){return typeof d != "undefined"})
+	})
+
+	var svg = d3.select("#fullpage")
+          .append("svg")
+          .attr("preserveAspectRatio", "xMinYMin meet")
+          .attr("viewBox","0 0 " + (width + margin.left + margin.right)  + " " + (height + margin.top + margin.bottom))
+          .classed("svg-content-responsive", true)
+
+	g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+	x.domain(d3.extent(jsondata, function(d) { return d.time; }));
+
+	y.domain([
+		d3.min(stratas, function(s) { return d3.min(s.vals, function(d) { return d.surv; }); }),
+		d3.max(stratas, function(s) { return d3.max(s.vals, function(d) { return d.surv; }); })
+		]);
+
+	z.domain(stratas.map(function(s) { return s.id; }));
+
+	g.append("g")
+	  .attr("class", "axis axis--x")
+	  .attr("transform", "translate(0," + height + ")")
+	  .call(d3.axisBottom(x));
+
+	g.append("g")
+	  .attr("class", "axis axis--y")
+	  .call(d3.axisLeft(y))
+	.append("text")
+	  .attr("transform", "rotate(-90)")
+	  .attr("y", 6)
+	  .attr("dy", "0.71em")
+	  .attr("fill", "#000")
+	  .text("Överlevnad");
+
+	var survline = g.selectAll(".survline")
+	 .data(stratas)
+	 .enter().append("g")
+	   .attr("class", "survline");
+
+	survline.append("path")
+	  .attr("class", "line")
+	  .attr("d", function(d) { return line(d.vals); })
+	  .style("stroke", function(d) { return z(d.id); });
+</script>
+
+
+
+</html>
