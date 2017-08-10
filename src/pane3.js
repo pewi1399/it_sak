@@ -3,13 +3,12 @@ var margin = {top: 33, left: 40, right: 30, bottom: 75},
     width  = 960 - margin.left - margin.right,
     height = 500  - margin.top  - margin.bottom
 
-var color = d3.scaleOrdinal(d3.schemeCategory10);
+var color = d3.scaleOrdinal(d3.schemeCategory20);
 
 var x = d3.scaleBand().rangeRound([0, width]).padding(0.1),
     y = d3.scaleLinear().rangeRound([height, 0]);
 
-
-var svg = d3.select("#fullpage")
+var svg = d3.select("#panel3")
         .append("svg")
         .attr("preserveAspectRatio", "xMinYMin meet")
         .attr("viewBox","0 0 " + (width + margin.left + margin.right)  + " " + (height + margin.top + margin.bottom))
@@ -17,22 +16,15 @@ var svg = d3.select("#fullpage")
 
 g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-var parseTime = d3.timeParse("%Y-%m-%d");
-
 var data = backlog
 
-
-x.domain(data.map(function(d) { return parseTime(d.time); }));
+x.domain(data.map(function(d) { return d.time; }));
 y.domain(
   [
-  0, 
-  d3.max(data, function(d) { return d.backlog; })
+  d3.min(data, function(d) { return d.backlogDelta; }), 
+  d3.max(data, function(d) { return d.backlogDelta; })
   ]
   ).nice();
-
-var line = d3.line()
-    .x(function(d) { return x(d.time); })
-    .y(function(d) { return y(d.backlog); });
 
 g.append("g")
   .attr("class", "axis axis--x")
@@ -55,21 +47,54 @@ g.append("g")
   .attr("fill", "#000")
   .text("Antal");
 
-g.selectAll(".liness")
+g.selectAll(".bar")
     .data(data)
-    .append("path")
-      .attr("stroke", "steelblue")
-      .attr("stroke-width", 1.5)
-      .attr("class", "liness")
-      .attr("d", line);
-      /*.on("mouseover", function(d){
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d.time); })
+      .attr("y", function(d) { return y(d.backlogDelta); })
+      .attr("width", x.bandwidth())
+      .attr("class", function(d) {
+
+            if (d.backlogDelta < 0){
+                return "bar negative";
+            } else {
+                return "bar positive";
+            }
+
+        })
+        .attr("data-yr", function(d){
+            return d.time;
+        })
+        .attr("data-c", function(d){
+            return d.backlogDelta;
+        })
+        .attr("title", function(d){
+            return (d.time + ": " + d.backlogDelta + " °C")
+        })
+        .attr("y", function(d) {
+
+            if (d.backlogDelta > 0){
+                return y(d.backlogDelta);
+            } else {
+                return y(0);
+            }
+
+        })
+        .attr("x", function(d) {
+            return x(d.time);
+        })
+        .attr("height", function(d) {
+            return Math.abs(y(d.backlogDelta) - y(0));
+        })
+        .on("mouseover", function(d){
             // alert("Year: " + d.Year + ": " + d.Celsius + " Celsius");
             d3.select("#_yr")
                 .text("Månad: " + d.time);
             d3.select("#degrree")
                 .text("Förändring:" + d.backlogDelta);
         });
-*/
+
 
 svg.append("g")
     .attr("class", "infowin")
