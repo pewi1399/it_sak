@@ -70,7 +70,7 @@
 	  .attr("y", 6)
 	  .attr("dy", "0.71em")
 	  .attr("fill", "#000")
-	  .text("Överlevnad");
+	  .text("Survival of vulnerabilities over latest 45 days");
 
 	var survline = g2.selectAll(".survline")
 	 .data(stratas)

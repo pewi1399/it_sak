@@ -45,7 +45,7 @@ g.append("g")
   .attr("y", 6)
   .attr("dy", "0.71em")
   .attr("fill", "#000")
-  .text("Antal");
+  .text("Change to backlog");
 
 g.selectAll(".bar")
     .data(data)

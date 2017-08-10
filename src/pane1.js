@@ -55,7 +55,7 @@ g.append("g")
   .attr("y", 6)
   .attr("dy", "0.71em")
   .attr("fill", "#000")
-  .text("Antal");
+  .text("Size of backlog");
 
 g.append("path")
     .datum(data)
