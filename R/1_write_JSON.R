@@ -27,3 +27,5 @@ survdata <- rbind(extrarow, survdata)
 
 writeLines(paste0("var jsondata = ", toJSON(survdata)), "data/survivaldata.js")
 
+writeLines(paste0("var backlog = ", toJSON(backlogdata)), "data/backlogdata.js")
+

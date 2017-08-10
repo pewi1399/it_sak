@@ -90,21 +90,21 @@ plotdata <- patchdata %>%
 
 
 # in and out of legacy every month
-# bars_plot <- ggplot(plotdata)+
-#     aes(x = time, y = backlogDelta)+
-#     geom_col()
+ bars_plot <- ggplot(plotdata)+
+     aes(x = time, y = backlogDelta)+
+     geom_col()
 
 
 plotdata$backlog <- cumsum(plotdata$backlogDelta)
 
-# line_plot <- ggplot(plotdata)+
-#     aes(x = time)+
-#     geom_line(aes(y = backlog, group = 1))+
-#     xlab("")
-# 
-# library(gridExtra)
-# multiplot <- gridExtra::arrangeGrob(line_plot, bars_plot, heights = c(100,25))
-# plot(multiplot)
+ line_plot <- ggplot(plotdata)+
+     aes(x = time)+
+     geom_line(aes(y = backlog, group = 1))+
+     xlab("")
+ 
+ library(gridExtra)
+ multiplot <- gridExtra::arrangeGrob(line_plot, bars_plot, heights = c(100,25))
+ plot(multiplot)
 
 saveRDS(plotdata, "data/backlogdata.rds")
 
