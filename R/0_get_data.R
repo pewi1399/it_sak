@@ -24,6 +24,7 @@ patchdata <- data.frame(
                         type = sample(c("Server", "Client"), n, replace = TRUE)
                         )
 
+
 # add date for fixes
 patchdata <- 
     patchdata %>% 
@@ -41,103 +42,114 @@ patchdata <-
         time = time + severity * 5
         )
 
-#---------------------------- survival functions -------------------------------
 
-# calculate survival function
-
-# Since the beginning of time
-survival_function <- Surv(patchdata$time, patchdata$fixed)
-survivaltable <- survfit(survival_function~patchdata$severity)
-
-#plot(
-#    survivaltable, 
-#    col = c("red", "orange", "royalblue", "gold")
-#    )
-
-# visualise survival for latest time window
-patchdata_latest <- subset(patchdata, patch_release > today -31) 
-survival_function_latest <- Surv(patchdata_latest$time, patchdata_latest$fixed)
-survivaltable_latest <- survfit(survival_function_latest~patchdata_latest$severity)
-
-#plot(
-#    survivaltable_latest, 
-#    col = c("red", "orange", "royalblue", "gold")
-#)
-
-
-survdata <- data.frame(
-  surv = survivaltable_latest$surv
-  , strata = rep(
-    names(survivaltable_latest$strata), 
-    survivaltable_latest$strata
-  )
-  ,time = survivaltable_latest$time
-) %>% 
-  mutate(
-    strata = as.numeric(gsub("^.*(.+?)$", "\\1",strata))
-  )
-
-saveRDS(survdata, "data/survivaldata.rds")
-#-------------------------------------------------------------------------------
-
-#---------------------------- backlog and legacy -------------------------------
-
-# visualise backlog and how it has been growing
-plotdata <- patchdata %>% 
-    group_by(year, month) %>% 
-    summarise(backlogDelta = sum(legacy)) %>% 
+get_data <- function(os){
+  #---------------------------- survival functions -------------------------------
+  
+  if(os != "All"){
+    patchdata <- subset(patchdata , os == os)
+  }
+  
+  # calculate survival function
+  
+  # Since the beginning of time
+  survival_function <- Surv(patchdata$time, patchdata$fixed)
+  survivaltable <- survfit(survival_function~patchdata$severity)
+  
+  #plot(
+  #    survivaltable, 
+  #    col = c("red", "orange", "royalblue", "gold")
+  #    )
+  
+  # visualise survival for latest time window
+  patchdata_latest <- subset(patchdata, patch_release > today -31) 
+  survival_function_latest <- Surv(patchdata_latest$time, patchdata_latest$fixed)
+  survivaltable_latest <- survfit(survival_function_latest~patchdata_latest$severity)
+  
+  #plot(
+  #    survivaltable_latest, 
+  #    col = c("red", "orange", "royalblue", "gold")
+  #)
+  
+  
+  survdata <- data.frame(
+    surv = survivaltable_latest$surv
+    , strata = rep(
+      names(survivaltable_latest$strata), 
+      survivaltable_latest$strata
+    )
+    ,time = survivaltable_latest$time
+  ) %>% 
     mutate(
-        time = paste0(year,"-", month, "-01"),
-        time = as.Date(time, format = "%Y-%m-%d"),
-        backlogDelta = backlogDelta * sample(c(1,-1), n(), prob = c(0.57, 0.43), replace  = TRUE)
-           )
-
-
-# in and out of legacy every month
- bars_plot <- ggplot(plotdata)+
-     aes(x = time, y = backlogDelta)+
-     geom_col()
-
-
-plotdata$backlog <- cumsum(plotdata$backlogDelta)
-
- line_plot <- ggplot(plotdata)+
-     aes(x = time)+
-     geom_line(aes(y = backlog, group = 1))+
-     xlab("")
- 
- library(gridExtra)
- multiplot <- gridExtra::arrangeGrob(line_plot, bars_plot, heights = c(100,25))
- plot(multiplot)
-
-saveRDS(plotdata, "data/backlogdata.rds")
-#-------------------------------------------------------------------------------
-
-#------------------------ diff compared to a year ago --------------------------
-tmp <- 
-patchdata %>% 
-  group_by(year, os, type, severity) %>% 
-  summarise(n_patches = n()) %>%
-  ungroup()
+      strata = as.numeric(gsub("^.*(.+?)$", "\\1",strata))
+    )
   
-tabledata <- patchdata %>%   
-  group_by(year, os, type) %>% 
-  summarise(n_units = n() + round(rnorm(1, 500, 50))) %>% 
-  ungroup() %>% 
-  full_join(tmp, by = c("year", "os", "type")) %>% 
-  mutate(avg_patches = round(n_patches/n_units, 2)) %>% 
-  select(-n_units)
+  saveRDS(survdata, paste0("data/survivaldata_", os,".rds"))
+  #-------------------------------------------------------------------------------
   
-# pre process data maybe do this in js in a later version
-tabledata <- 
-  tabledata %>% 
-  filter(year %in% 2016:2017) %>% 
-  gather(key, value, -year, -os, -severity, -type) %>% 
-  mutate(key = paste0(key,"_", year)) %>%
-  select(-year) %>% 
-  spread(key, value)
-
- writeClipboard(kable(tabledata, format = "html"))
-
-saveRDS(tabledata, "data/tabledata.rds")
+  #---------------------------- backlog and legacy -------------------------------
+  
+  # visualise backlog and how it has been growing
+  plotdata <- patchdata %>% 
+      group_by(year, month) %>% 
+      summarise(backlogDelta = sum(legacy)) %>% 
+      mutate(
+          time = paste0(year,"-", month, "-01"),
+          time = as.Date(time, format = "%Y-%m-%d"),
+          backlogDelta = backlogDelta * sample(c(1,-1), n(), prob = c(0.57, 0.43), replace  = TRUE)
+             )
+  
+  
+  # in and out of legacy every month
+   bars_plot <- ggplot(plotdata)+
+       aes(x = time, y = backlogDelta)+
+       geom_col()
+  
+  
+  plotdata$backlog <- cumsum(plotdata$backlogDelta)
+  
+   line_plot <- ggplot(plotdata)+
+       aes(x = time)+
+       geom_line(aes(y = backlog, group = 1))+
+       xlab("")
+   
+   library(gridExtra)
+   multiplot <- gridExtra::arrangeGrob(line_plot, bars_plot, heights = c(100,25))
+   plot(multiplot)
+  
+  saveRDS(plotdata, paste0("data/backlogdata_",os ,".rds"))
+  #-------------------------------------------------------------------------------
+  
+  #------------------------ diff compared to a year ago --------------------------
+  tmp <- 
+  patchdata %>% 
+    group_by(year, os, type, severity) %>% 
+    summarise(n_patches = n()) %>%
+    ungroup()
+    
+  tabledata <- patchdata %>%   
+    group_by(year, os, type) %>% 
+    summarise(n_units = n() + round(rnorm(1, 500, 50))) %>% 
+    ungroup() %>% 
+    full_join(tmp, by = c("year", "os", "type")) %>% 
+    mutate(avg_patches = round(n_patches/n_units, 2)) %>% 
+    select(-n_units)
+    
+  # pre process data maybe do this in js in a later version
+  tabledata <- 
+    tabledata %>% 
+    filter(year %in% 2016:2017) %>% 
+    gather(key, value, -year, -os, -severity, -type) %>% 
+    mutate(key = paste0(key,"_", year)) %>%
+    select(-year) %>% 
+    spread(key, value)
+  
+   writeClipboard(kable(tabledata, format = "html"))
+  
+  saveRDS(tabledata, paste0("data/tabledata_", os, ".rds"))
+  #-----------------------------------------------------------------------------
+}
 #-------------------------------------------------------------------------------
+get_data("All")
+get_data("Linux")
+get_data("Microsoft")
