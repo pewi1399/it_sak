@@ -60,7 +60,7 @@
 	g2.append("g")
 	  .attr("class", "axis axis--x")
 	  .attr("transform", "translate(0," + height + ")")
-	  .call(d3.axisBottom(x2));
+	  .call(d3.axisBottom(x2).ticks(6));
 
 	g2.append("g")
 	  .attr("class", "axis axis--y")

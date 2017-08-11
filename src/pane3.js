@@ -29,7 +29,7 @@ y.domain(
 g.append("g")
   .attr("class", "axis axis--x")
   .attr("transform", "translate(0," + height + ")")
-  .call(d3.axisBottom(x).ticks(5))
+  .call(d3.axisBottom(x).tickValues(x.domain().filter(function(d, i) { return !(i % 6); })))
       .selectAll("text")  
         .style("text-anchor", "end")
         .attr("dx", "-.8em")
@@ -89,9 +89,9 @@ g.selectAll(".bar")
         })
         .on("mouseover", function(d){
             // alert("Year: " + d.Year + ": " + d.Celsius + " Celsius");
-            d3.select("#_yr")
+            d3.select("#_yr3")
                 .text("Månad: " + d.time);
-            d3.select("#degrree")
+            d3.select("#degrree3")
                 .text("Förändring:" + d.backlogDelta);
         });
 
@@ -100,11 +100,11 @@ svg.append("g")
     .attr("class", "infowin")
     .attr("transform", "translate(70, 30)")
     .append("text")
-    .attr("id", "_yr");
+    .attr("id", "_yr3");
 
 svg.append("g")
     .attr("class", "infowin")
     .attr("transform", "translate(200, 30)")
     .append("text")
-    .attr("id","degrree");
+    .attr("id","degrree3");
 	

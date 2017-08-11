@@ -5,6 +5,7 @@ library(dplyr)
 
 survdata <- readRDS("data/survivaldata.rds")
 backlogdata <- readRDS("data/backlogdata.rds")
+tabledata <- readRDS("data/tabledata.rds")
 
 survdata <- 
 survdata %>% 
@@ -26,6 +27,5 @@ extrarow <- data.frame(
 survdata <- rbind(extrarow, survdata)
 
 writeLines(paste0("var jsondata = ", toJSON(survdata)), "data/survivaldata.js")
-
 writeLines(paste0("var backlog = ", toJSON(backlogdata)), "data/backlogdata.js")
-
+writeLines(paste0("var tabledata = ", toJSON(tabledata)), "data/tabledata.js")

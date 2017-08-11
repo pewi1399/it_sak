@@ -3,6 +3,8 @@ rm(list=ls())
 library(survival)
 library(ggplot2)
 library(dplyr)
+library(tidyr)
+library(knitr)
 
 #-------------------------------- simulate data --------------------------------
 n <- 100000
@@ -17,7 +19,9 @@ patchdata <- data.frame(
                         day = sample(1:31, n, replace = TRUE),
                         days = rexp(n,0.1),
                         legacy = sample(0:1,n, prob = c(1-legacy_p, legacy_p), replace = TRUE),
-                        severity = sample(1:4,n, replace = TRUE)
+                        severity = sample(1:4,n, replace = TRUE),
+                        os = sample(c("Linux", "Microsoft"), n, replace = TRUE),
+                        type = sample(c("Server", "Client"), n, replace = TRUE)
                         )
 
 # add date for fixes
@@ -107,5 +111,33 @@ plotdata$backlog <- cumsum(plotdata$backlogDelta)
  plot(multiplot)
 
 saveRDS(plotdata, "data/backlogdata.rds")
+#-------------------------------------------------------------------------------
 
+#------------------------ diff compared to a year ago --------------------------
+tmp <- 
+patchdata %>% 
+  group_by(year, os, type, severity) %>% 
+  summarise(n_patches = n()) %>%
+  ungroup()
+  
+tabledata <- patchdata %>%   
+  group_by(year, os, type) %>% 
+  summarise(n_units = n() + round(rnorm(1, 500, 50))) %>% 
+  ungroup() %>% 
+  full_join(tmp, by = c("year", "os", "type")) %>% 
+  mutate(avg_patches = round(n_patches/n_units, 2)) %>% 
+  select(-n_units)
+  
+# pre process data maybe do this in js in a later version
+tabledata <- 
+  tabledata %>% 
+  filter(year %in% 2016:2017) %>% 
+  gather(key, value, -year, -os, -severity, -type) %>% 
+  mutate(key = paste0(key,"_", year)) %>%
+  select(-year) %>% 
+  spread(key, value)
+
+ writeClipboard(kable(tabledata, format = "html"))
+
+saveRDS(tabledata, "data/tabledata.rds")
 #-------------------------------------------------------------------------------

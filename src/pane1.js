@@ -22,7 +22,7 @@ var parseTime = d3.timeParse("%Y-%m-%d");
 var data = backlog
 
 
-x.domain(data.map(function(d) { return parseTime(d.time); }));
+x.domain(data.map(function(d) { return d.time; }));
 y.domain(
   [
   0, 
@@ -31,7 +31,7 @@ y.domain(
   ).nice();
 
 var line = d3.line()
-    .x(function(d) { return x(parseTime(d.time)); })
+    .x(function(d) { return x(d.time); })
     .y(function(d) { return y(d.backlog); });
 
 
@@ -39,7 +39,7 @@ var line = d3.line()
 g.append("g")
   .attr("class", "axis axis--x")
   .attr("transform", "translate(0," + height + ")")
-  .call(d3.axisBottom(x).ticks(5))
+  .call(d3.axisBottom(x).tickValues(x.domain().filter(function(d, i) { return !(i % 6); })))
       .selectAll("text")  
         .style("text-anchor", "end")
         .attr("dx", "-.8em")
