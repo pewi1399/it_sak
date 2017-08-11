@@ -1,5 +1,5 @@
 
-var margin = {top: 33, left: 40, right: 30, bottom: 75},
+var margin = {top: 33, left: 40, right: 30, bottom: 33},
     width  = 960 - margin.left - margin.right,
     height = 500  - margin.top  - margin.bottom
 
@@ -32,9 +32,9 @@ g.append("g")
   .call(d3.axisBottom(x).tickValues(x.domain().filter(function(d, i) { return !(i % 6); })))
       .selectAll("text")  
         .style("text-anchor", "end")
-        .attr("dx", "-.8em")
-        .attr("dy", ".15em")
-        .attr("transform", "rotate(-65)")
+        .attr("dx", "2.2em")
+        .attr("dy", ".65em")
+        //.attr("transform", "rotate(-65)")
   
 
 g.append("g")
@@ -90,9 +90,9 @@ g.selectAll(".bar")
         .on("mouseover", function(d){
             // alert("Year: " + d.Year + ": " + d.Celsius + " Celsius");
             d3.select("#_yr3")
-                .text("Månad: " + d.time);
+                .text("Month: " + d.time);
             d3.select("#degrree3")
-                .text("Förändring:" + d.backlogDelta);
+                .text("Change:" + d.backlogDelta);
         });
 
 
