@@ -27,7 +27,7 @@ y.domain(
   ).nice();
 
 g.append("g")
-  .attr("class", "axis axis--x")
+  .attr("class", "axis axis--xx")
   .attr("transform", "translate(0," + height + ")")
   .call(d3.axisBottom(x).tickValues(x.domain().filter(function(d, i) { return !(i % 6); })))
       .selectAll("text")  
@@ -38,7 +38,7 @@ g.append("g")
   
 
 g.append("g")
-  .attr("class", "axis axis--y")
+  .attr("class", "axis axis--yy")
   .call(d3.axisLeft(y))
 .append("text")
   .attr("transform", "rotate(-90)")

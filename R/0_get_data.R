@@ -144,7 +144,7 @@ get_data <- function(os){
     select(-year) %>% 
     spread(key, value)
   
-   writeClipboard(kable(tabledata, format = "html"))
+   #writeClipboard(kable(tabledata, format = "html"))
   
   saveRDS(tabledata, paste0("data/tabledata_", os, ".rds"))
   #-----------------------------------------------------------------------------
