@@ -27,14 +27,25 @@ yy.domain(
   g.select(".axis--yy")
   .transition()
   .call(d3.axisLeft(yy))
-  
-  g.selectAll(".bar")
-    .data(data)
-    .enter().append("rect")
+
+
+  // THIS IS THE ACTUAL WORK!
+  var bars = svg.selectAll(".bar").data(data) // (data) is an array/iterable thing, second argument is an ID generator function
+
+  bars.exit()
+    .transition()
+      .duration(300)
+    .attr("y", y(0))
+    .attr("height", height - yy(0))
+    .style('fill-opacity', 1e-6)
+    .remove();
+
+  // data that needs DOM = enter() (a set/selection, not an event!)
+  bars.enter().append("rect")
       .attr("class", "bar")
-      .attr("x", function(d) { return x(d.time); })
-      .attr("y", function(d) { return y(d.backlogDelta); })
-      .attr("width", x.bandwidth())
+      .attr("x", function(d) { return xx(d.time); })
+      .attr("y", function(d) { return yy(d.backlogDelta); })
+      .attr("width", xx.bandwidth())
       .attr("class", function(d) {
 
             if (d.backlogDelta < 0){
@@ -56,17 +67,17 @@ yy.domain(
         .attr("y", function(d) {
 
             if (d.backlogDelta > 0){
-                return y(d.backlogDelta);
+                return yy(d.backlogDelta);
             } else {
-                return y(0);
+                return yy(0);
             }
 
         })
         .attr("x", function(d) {
-            return x(d.time);
+            return xx(d.time);
         })
         .attr("height", function(d) {
-            return Math.abs(y(d.backlogDelta) - y(0));
+            return Math.abs(yy(d.backlogDelta) - yy(0));
         })
         .on("mouseover", function(d){
             // alert("Year: " + d.Year + ": " + d.Celsius + " Celsius");
@@ -76,6 +87,50 @@ yy.domain(
                 .text("Change:" + d.backlogDelta);
         });
 
+  // the "UPDATE" set:
+  bars.transition().duration(300).attr("x", function(d) { return xx(d.time); })
+      .attr("y", function(d) { return yy(d.backlogDelta); })
+      .attr("width", xx.bandwidth())
+      .attr("class", function(d) {
+
+            if (d.backlogDelta < 0){
+                return "bar negative";
+            } else {
+                return "bar positive";
+            }
+
+        })
+        .attr("data-yr", function(d){
+            return d.time;
+        })
+        .attr("data-c", function(d){
+            return d.backlogDelta;
+        })
+        .attr("title", function(d){
+            return (d.time + ": " + d.backlogDelta + " °C")
+        })
+        .attr("y", function(d) {
+
+            if (d.backlogDelta > 0){
+                return yy(d.backlogDelta);
+            } else {
+                return yy(0);
+            }
+
+        })
+        .attr("x", function(d) {
+            return xx(d.time);
+        })
+        .attr("height", function(d) {
+            return Math.abs(yy(d.backlogDelta) - yy(0));
+        })
+        .on("mouseover", function(d){
+            // alert("Year: " + d.Year + ": " + d.Celsius + " Celsius");
+            d3.select("#_yr3")
+                .text("Month: " + d.time);
+            d3.select("#degrree3")
+                .text("Change:" + d.backlogDelta);
+        });
 
   }else if(os == "Microsoft"){
     alert(2)

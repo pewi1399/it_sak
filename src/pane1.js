@@ -5,8 +5,8 @@ var margin = {top: 33, left: 40, right: 30, bottom: 33},
 
 var color = d3.scaleOrdinal(d3.schemeCategory10);
 
-var x = d3.scaleBand().rangeRound([0, width]).padding(0.1),
-    y = d3.scaleLinear().rangeRound([height, 0]);
+var x_date = d3.scaleTime().range([0, width]),
+    y_backlog = d3.scaleLinear().rangeRound([height, 0]);
 
 
 var svg = d3.select("#panel1")
@@ -21,9 +21,8 @@ var parseTime = d3.timeParse("%Y-%m-%d");
 
 var data = backlog
 
-
-x.domain(data.map(function(d) { return d.time; }));
-y.domain(
+x_date.domain(d3.extent(data, function(d) { return parseTime(d.time); }));
+y_backlog.domain(
   [
   0, 
   d3.max(data, function(d) { return d.backlog; })
@@ -31,15 +30,15 @@ y.domain(
   ).nice();
 
 var line = d3.line()
-    .x(function(d) { return x(d.time); })
-    .y(function(d) { return y(d.backlog); });
+    .x(function(d) { return x_date(parseTime(d.time)); })
+    .y(function(d) { return y_backlog(d.backlog); });
 
 
 
 g.append("g")
-  .attr("class", "axis axis--x")
+  .attr("class", "axis axis--x_date")
   .attr("transform", "translate(0," + height + ")")
-  .call(d3.axisBottom(x).tickValues(x.domain().filter(function(d, i) { return !(i % 6); })))
+  .call(d3.axisBottom(x_date))//.tickValues(x_date.domain().filter(function(d, i) { return !(i % 6); })))
       .selectAll("text")  
         .style("text-anchor", "end")
         .attr("dx", "2.2em")
@@ -48,8 +47,8 @@ g.append("g")
   
 
 g.append("g")
-  .attr("class", "axis axis--y")
-  .call(d3.axisLeft(y))
+  .attr("class", "axis axis--y_backlog")
+  .call(d3.axisLeft(y_backlog))
 .append("text")
   .attr("transform", "rotate(-90)")
   .attr("y", 6)
@@ -57,7 +56,7 @@ g.append("g")
   .attr("fill", "#000")
   .text("Size of backlog");
 
-g.append("path")
+var path = g.append("path")
     .datum(data)
     .attr("fill", "none")
     .attr("stroke", "steelblue")
@@ -71,6 +70,15 @@ g.append("path")
             d3.select("#degrree")
                 .text("Number of patches:" + d.backlog);
         });
+
+var totalLength = path.node().getTotalLength();
+
+path
+  .attr("stroke-dasharray", totalLength + " " + totalLength)
+  .attr("stroke-dashoffset", totalLength)
+  .transition()
+    .duration(3000)
+    .attr("stroke-dashoffset", 0);
 
 svg.append("g")
     .attr("class", "infowin")
