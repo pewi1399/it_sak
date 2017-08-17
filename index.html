@@ -29,7 +29,19 @@
 
 	<script type="text/javascript">
   $(document).ready(function(){
-     $('#myTable').DataTable(); 
+     $('#myTable').DataTable();
+
+     $("#All").click(function(e){
+        chooseOs("All")
+      });
+
+    $("#Linux").click(function(e){
+        chooseOs("Linux")
+    });
+
+    $("#Microsoft").click(function(e){
+        chooseOs("Microsoft")
+    });
 });
 	</script>
 
@@ -270,9 +282,9 @@ p{
     <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Operating system
     <span class="caret"></span></button>
     <ul class="dropdown-menu">
-      <li><a href="#">All</a></li>
-      <li><a href="#">Linux</a></li>
-      <li><a href="#">Microsoft</a></li>
+      <li><a href="#" id = "All">All</a></li>
+      <li><a href="#" id = "Linux">Linux</a></li>
+      <li><a href="#" id = "Microsoft">Microsoft</a></li>
     </ul>
     </div>
 
