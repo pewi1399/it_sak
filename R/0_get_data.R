@@ -6,6 +6,9 @@ library(dplyr)
 library(tidyr)
 library(knitr)
 
+
+set.seed(20170817)
+
 #-------------------------------- simulate data --------------------------------
 n <- 100000
 legacy_p <- 1/200
@@ -92,11 +95,13 @@ get_data <- function(os){
   # visualise backlog and how it has been growing
   plotdata <- patchdata %>% 
       group_by(year, month) %>% 
-      summarise(backlogDelta = sum(legacy)) %>% 
+      summarise(backlogDelta = sum(legacy),
+                influx = round(n()/20)) %>% 
       mutate(
           time = paste0(year,"-", month, "-01"),
           time = as.Date(time, format = "%Y-%m-%d"),
-          backlogDelta = backlogDelta * sample(c(1,-1), n(), prob = c(0.57, 0.43), replace  = TRUE)
+          backlogDelta = backlogDelta * sample(c(1,-1), n(), prob = c(0.57, 0.43), replace  = TRUE),
+          backlogDelta = ifelse(time < "2012-04-01", abs(backlogDelta), backlogDelta)
              )
   
   

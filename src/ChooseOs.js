@@ -2,7 +2,7 @@ chooseOs = function(os){
 
   if(os == "Linux"){
 
-window.backlog = [{"year":2012,"month":1,"backlogDelta":7,"time":"2012-01-01","backlog":7},{"year":2012,"month":2,"backlogDelta":3,"time":"2012-02-01","backlog":10},{"year":2012,"month":3,"backlogDelta":7,"time":"2012-03-01","backlog":17},{"year":2012,"month":4,"backlogDelta":5,"time":"2012-04-01","backlog":22},{"year":2012,"month":5,"backlogDelta":7,"time":"2012-05-01","backlog":29},{"year":2012,"month":6,"backlogDelta":-10,"time":"2012-06-01","backlog":19},{"year":2012,"month":7,"backlogDelta":8,"time":"2012-07-01","backlog":27},{"year":2012,"month":8,"backlogDelta":-11,"time":"2012-08-01","backlog":16},{"year":2012,"month":9,"backlogDelta":9,"time":"2012-09-01","backlog":25},{"year":2012,"month":10,"backlogDelta":8,"time":"2012-10-01","backlog":33},{"year":2012,"month":11,"backlogDelta":8,"time":"2012-11-01","backlog":41},{"year":2012,"month":12,"backlogDelta":10,"time":"2012-12-01","backlog":51},{"year":2013,"month":1,"backlogDelta":5,"time":"2013-01-01","backlog":56},{"year":2013,"month":2,"backlogDelta":-6,"time":"2013-02-01","backlog":50},{"year":2013,"month":3,"backlogDelta":-8,"time":"2013-03-01","backlog":42},{"year":2013,"month":4,"backlogDelta":-4,"time":"2013-04-01","backlog":38},{"year":2013,"month":5,"backlogDelta":-5,"time":"2013-05-01","backlog":33},{"year":2013,"month":6,"backlogDelta":6,"time":"2013-06-01","backlog":39},{"year":2013,"month":7,"backlogDelta":-3,"time":"2013-07-01","backlog":36},{"year":2013,"month":8,"backlogDelta":-7,"time":"2013-08-01","backlog":29}];
+backlog = [{"year":2012,"month":1,"backlogDelta":7,"time":"2012-01-01","backlog":7},{"year":2012,"month":2,"backlogDelta":3,"time":"2012-02-01","backlog":10},{"year":2012,"month":3,"backlogDelta":7,"time":"2012-03-01","backlog":17},{"year":2012,"month":4,"backlogDelta":5,"time":"2012-04-01","backlog":22},{"year":2012,"month":5,"backlogDelta":7,"time":"2012-05-01","backlog":29},{"year":2012,"month":6,"backlogDelta":-10,"time":"2012-06-01","backlog":19},{"year":2012,"month":7,"backlogDelta":8,"time":"2012-07-01","backlog":27},{"year":2012,"month":8,"backlogDelta":-11,"time":"2012-08-01","backlog":16},{"year":2012,"month":9,"backlogDelta":9,"time":"2012-09-01","backlog":25},{"year":2012,"month":10,"backlogDelta":8,"time":"2012-10-01","backlog":33},{"year":2012,"month":11,"backlogDelta":8,"time":"2012-11-01","backlog":41},{"year":2012,"month":12,"backlogDelta":10,"time":"2012-12-01","backlog":51},{"year":2013,"month":1,"backlogDelta":5,"time":"2013-01-01","backlog":56},{"year":2013,"month":2,"backlogDelta":-6,"time":"2013-02-01","backlog":50},{"year":2013,"month":3,"backlogDelta":-8,"time":"2013-03-01","backlog":42},{"year":2013,"month":4,"backlogDelta":-4,"time":"2013-04-01","backlog":38},{"year":2013,"month":5,"backlogDelta":-5,"time":"2013-05-01","backlog":33},{"year":2013,"month":6,"backlogDelta":6,"time":"2013-06-01","backlog":39},{"year":2013,"month":7,"backlogDelta":-3,"time":"2013-07-01","backlog":36},{"year":2013,"month":8,"backlogDelta":-7,"time":"2013-08-01","backlog":29}];
 
 var data = backlog;
 
@@ -14,7 +14,7 @@ var line = d3.line()
     .x(function(d) { return x_date(parseTime(d.time)); })
     .y(function(d) { return y_backlog(d.backlog); });
 
-g.selectAll(".axis--x_date")
+d3.selectAll(".axis--x_date")
   .transition()
   .call(d3.axisBottom(x_date))//.tickValues(x_date.domain().filter(function(d, i) { return !(i % 6); })))
       /*.selectAll("text")  
@@ -35,6 +35,28 @@ g.slectAll("axis--y_backlog")
   .text("Size of backlog");
 */
 
+
+var path = d3.selectAll(".liness")
+    .datum(data)
+    .transition()
+    .attr("d", line)
+
+
+/*    
+    .attr("fill", "none")
+    .attr("stroke", "steelblue")
+    .attr("stroke-width", 1.5)
+    .attr("class", "liness")
+    .attr("d", line)
+    .on("mouseover", function(d){
+            // alert("Year: " + d.Year + ": " + d.Celsius + " Celsius");
+            d3.select("#_yr")
+                .text("Month: " + d.time);
+            d3.select("#degrree")
+                .text("Number of patches:" + d.backlog);
+        });
+*/
+
 // rescale pane 3
 var x_bar = d3.scaleBand().rangeRound([0, width]).padding(0.1),
     y_bar = d3.scaleLinear().rangeRound([height, 0]);
@@ -47,11 +69,11 @@ y_bar.domain(
   ]
   ).nice();
   
-  g.select(".axis--x_bar")
+  d3.select(".axis--x_bar")
       .transition()
       .call(d3.axisBottom(x_bar).tickValues(x_bar.domain().filter(function(d, i) { return !(i % 6); })));
         
-  g.select(".axis--y_backlogDelta")
+  d3.select(".axis--y_backlogDelta")
   .transition()
   .call(d3.axisLeft(y_bar));
 

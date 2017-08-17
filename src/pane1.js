@@ -33,6 +33,10 @@ var line = d3.line()
     .x(function(d) { return x_date(parseTime(d.time)); })
     .y(function(d) { return y_backlog(d.backlog); });
 
+var line_influx = d3.line()
+    .x(function(d) { return x_date(parseTime(d.time)); })
+    .y(function(d) { return y_backlog(d.backlog/3+ 20); });
+
 
 
 g.append("g")
@@ -56,10 +60,10 @@ g.append("g")
   .attr("fill", "#000")
   .text("Size of backlog");
 
-var path = g.append("path")
+var path1 = g.append("path")
     .datum(data)
     .attr("fill", "none")
-    .attr("stroke", "steelblue")
+    .attr("stroke", "#1f77b4")
     .attr("stroke-width", 1.5)
     .attr("class", "liness")
     .attr("d", line)
@@ -71,9 +75,27 @@ var path = g.append("path")
                 .text("Number of patches:" + d.backlog);
         });
 
-var totalLength = path.node().getTotalLength();
+var totalLength = path1.node().getTotalLength();
 
-path
+path1
+  .attr("stroke-dasharray", totalLength + " " + totalLength)
+  .attr("stroke-dashoffset", totalLength)
+  .transition()
+    .duration(3000)
+    .attr("stroke-dashoffset", 0);
+
+
+var path2 = g.append("path")
+    .datum(data)
+    .attr("fill", "none")
+    .attr("stroke", "#ff7f0e")
+    .attr("stroke-width", 1.5)
+    .attr("class", "line_influx")
+    .attr("d", line_influx);
+
+var totalLength = path2.node().getTotalLength();
+
+path2
   .attr("stroke-dasharray", totalLength + " " + totalLength)
   .attr("stroke-dashoffset", totalLength)
   .transition()
@@ -91,3 +113,34 @@ svg.append("g")
     .attr("transform", "translate(200, 30)")
     .append("text")
     .attr("id","degrree");
+
+//------------------------------- legend ---------------------------------------
+ var legendRectSize = 18;                                 
+ var legendSpacing = 4;
+
+var color = d3.scaleOrdinal(d3.schemeCategory20);
+var legendLabel = ["Backlog", "New patches"]
+
+        var legend = svg.selectAll('.legend')                     
+          .data(["#1f77b4", "#ff7f0e"])                                   
+          .enter()                                                
+          .append('g')                                            
+          .attr('class', 'legend')                                
+          .attr('transform', function(d, i) {                     
+            var height = legendRectSize + legendSpacing;          
+            var offset =  height * color.domain().length / 2;     
+            var horz = -2 * legendRectSize;                       
+            var vert = i * height - offset;                       
+            return 'translate(' + (width) + ',' + (vert + margin.left ) + ')';
+          });                                                     
+
+        legend.append('rect')                                     
+          .attr('width', legendRectSize)                          
+          .attr('height', legendRectSize)                         
+          .style('fill', function(d){return d})                   
+          //.style('stroke', "red");                                
+
+        legend.append('text')                                     
+          .attr('x', legendRectSize + legendSpacing)              
+          .attr('y', legendRectSize - legendSpacing)              
+          .text(function(d, i) { return legendLabel[i] });                       

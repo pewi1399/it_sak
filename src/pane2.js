@@ -161,10 +161,11 @@ mouseG.append('svg:rect') // append a rect to catch mouse movements on canvas
 				.style("opacity", 0);
 		});
 
+
   // append circles for mouseover
   mousePerLine.append("circle")
     .attr("r", 7)
-    .attr("stroke", "black")
+    .attr("stroke", function(d, i){return z2("strata_" +(i+1));})
     .style("fill", "none")
     .style("stroke-width", "1px")
     .style("opacity", "0");
@@ -208,12 +209,11 @@ mouseG.append('svg:rect') // append a rect to catch mouse movements on canvas
 
 			//d3.selectAll("[name $='"+i+"_.text']").attr("fill", "grey") // a bit of a hack! (PW)
             // .text(y.invert(pos.y).toFixed(2));
-
-            d3.selectAll(".legend:nth-child("+(3 + i)+")").select("text").text(y2.invert(pos.y))
+            var severity = ["1", "2", "3", "4"]
+            d3.selectAll(".legend:nth-child("+(3 + i)+")").select("text").text("Severity " + (i+1) +": "+ Math.round(y2.invert(pos.y)*100)/100)
 
             return "translate(" + mouse[0] + "," + pos.y +")";
           });
-
 });
 //------------------------------ end line --------------------------------------
 
@@ -233,7 +233,7 @@ var color = d3.scaleOrdinal(d3.schemeCategory20);
             var offset =  height * color.domain().length / 2;     
             var horz = -2 * legendRectSize;                       
             var vert = i * height - offset;                       
-            return 'translate(' + (width) + ',' + (vert + margin.left) + ')';
+            return 'translate(' + (width - 50) + ',' + (vert + margin.left + 50) + ')';
           });                                                     
 
         legend.append('rect')                                     
@@ -245,4 +245,4 @@ var color = d3.scaleOrdinal(d3.schemeCategory20);
         legend.append('text')                                     
           .attr('x', legendRectSize + legendSpacing)              
           .attr('y', legendRectSize - legendSpacing)              
-          .text(function(d) { return d; });                       
+          .text(function(d, i) { return "Severity " + (i+1) +": 1" });                       
