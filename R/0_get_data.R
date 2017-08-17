@@ -48,9 +48,9 @@ patchdata <-
 
 get_data <- function(os){
   #---------------------------- survival functions -------------------------------
-  
+  subos = os
   if(os != "All"){
-    patchdata <- subset(patchdata , os == os)
+    patchdata <- subset(patchdata , os == subos)
   }
   
   # calculate survival function
@@ -101,7 +101,7 @@ get_data <- function(os){
           time = paste0(year,"-", month, "-01"),
           time = as.Date(time, format = "%Y-%m-%d"),
           backlogDelta = backlogDelta * sample(c(1,-1), n(), prob = c(0.57, 0.43), replace  = TRUE),
-          backlogDelta = ifelse(time < "2012-04-01", abs(backlogDelta), backlogDelta)
+          backlogDelta = ifelse(time < "2012-06-01", abs(backlogDelta), backlogDelta)
              )
   
   
@@ -157,4 +157,6 @@ get_data <- function(os){
 #-------------------------------------------------------------------------------
 get_data("All")
 get_data("Linux")
+
+set.seed(20170819)
 get_data("Microsoft")

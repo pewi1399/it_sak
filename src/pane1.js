@@ -99,7 +99,7 @@ path2
   .attr("stroke-dasharray", totalLength + " " + totalLength)
   .attr("stroke-dashoffset", totalLength)
   .transition()
-    .duration(3000)
+    .duration(2500)
     .attr("stroke-dashoffset", 0);
 
 svg.append("g")
