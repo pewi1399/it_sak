@@ -210,7 +210,7 @@ mouseG.append('svg:rect') // append a rect to catch mouse movements on canvas
 			//d3.selectAll("[name $='"+i+"_.text']").attr("fill", "grey") // a bit of a hack! (PW)
             // .text(y.invert(pos.y).toFixed(2));
             var severity = ["1", "2", "3", "4"]
-            d3.selectAll(".legend:nth-child("+(3 + i)+")").select("text").text("Severity " + (i+1) +": "+ Math.round(y2.invert(pos.y)*100)/100)
+            d3.selectAll(".legendz:nth-child("+(3 + i)+")").select("text").text("Severity " + (i+1) +": "+ Math.round(y2.invert(pos.y)*100)/100)
 
             return "translate(" + mouse[0] + "," + pos.y +")";
           });
@@ -223,11 +223,11 @@ mouseG.append('svg:rect') // append a rect to catch mouse movements on canvas
 
 var color = d3.scaleOrdinal(d3.schemeCategory20);
 
-        var legend = svg2.selectAll('.legend')                     
+        var legend = svg2.selectAll('.legendz')                     
           .data([color(0), color(1), color(2), color(3)])                                   
           .enter()                                                
           .append('g')                                            
-          .attr('class', 'legend')                                
+          .attr('class', 'legendz')                                
           .attr('transform', function(d, i) {                     
             var height = legendRectSize + legendSpacing;          
             var offset =  height * color.domain().length / 2;     
