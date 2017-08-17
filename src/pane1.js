@@ -131,7 +131,7 @@ var legendLabel = ["Backlog", "New patches"]
             var offset =  height * color.domain().length / 2;     
             var horz = -2 * legendRectSize;                       
             var vert = i * height - offset;                       
-            return 'translate(' + (width) + ',' + (vert + margin.left ) + ')';
+            return 'translate(' + (width -50) + ',' + (vert + margin.left ) + ')';
           });                                                     
 
         legend.append('rect')                                     
