@@ -5,7 +5,7 @@ var margin = {top: 33, left: 40, right: 30, bottom: 33},
 
 var color = d3.scaleOrdinal(d3.schemeCategory20);
 
-var x_date = d3.scaleBand().rangeRound([0, width]).padding(0.1),
+var x_bar = d3.scaleBand().rangeRound([0, width]).padding(0.1),
     y_backlogdelta = d3.scaleLinear().rangeRound([height, 0]);
 
 var svg = d3.select("#panel3")
@@ -18,7 +18,7 @@ g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.
 
 var data = backlog
 
-x_date.domain(data.map(function(d) { return d.time; }));
+x_bar.domain(data.map(function(d) { return d.time; }));
 y_backlogdelta.domain(
   [
   d3.min(data, function(d) { return d.backlogDelta; }), 
@@ -27,9 +27,9 @@ y_backlogdelta.domain(
   ).nice();
 
 g.append("g")
-  .attr("class", "axis axis--x_date")
+  .attr("class", "axis axis--x_bar")
   .attr("transform", "translate(0," + height + ")")
-  .call(d3.axisBottom(x_date).tickValues(x_date.domain().filter(function(d, i) { return !(i % 6); })))
+  .call(d3.axisBottom(x_bar).tickValues(x_bar.domain().filter(function(d, i) { return !(i % 6); })))
       .selectAll("text")  
         .style("text-anchor", "end")
         .attr("dx", "2.2em")
@@ -51,9 +51,9 @@ g.selectAll(".bar")
     .data(data)
     .enter().append("rect")
       .attr("class", "bar")
-      .attr("x", function(d) { return x_date(d.time); })
+      .attr("x", function(d) { return x_bar(d.time); })
       .attr("y", function(d) { return y_backlogdelta(d.backlogDelta); })
-      .attr("width", x_date.bandwidth())
+      .attr("width", x_bar.bandwidth())
       .attr("class", function(d) {
 
             if (d.backlogDelta < 0){
@@ -82,7 +82,7 @@ g.selectAll(".bar")
 
         })
         .attr("x", function(d) {
-            return x_date(d.time);
+            return x_bar(d.time);
         })
         .attr("height", function(d) {
             return Math.abs(y_backlogdelta(d.backlogDelta) - y_backlogdelta(0));
