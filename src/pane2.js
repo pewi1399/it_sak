@@ -110,14 +110,6 @@ mouseG.append('svg:rect') // append a rect to catch mouse movements on canvas
   .attr('fill', 'none')
   .attr('pointer-events', 'all')
   .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-  .on('mouseover', function() { // on mouse in show line, circles and text
-   // d3.select(".mouse-line")
-   //   .style("opacity", "1");
-    d3.selectAll(".mouse-per-line circle")
-      .style("opacity", "1");
-    d3.selectAll(".mouse-per-line text")
-      .style("opacity", "1");
-  })
   .on('mouseout', function() { // on mouse out hide line, circles and text
    // d3.select(".mouse-line")
    //   .style("opacity", "0");
@@ -127,6 +119,9 @@ mouseG.append('svg:rect') // append a rect to catch mouse movements on canvas
       .style("opacity", "0");
   })
   .on('mousemove', function() { // mouse moving over canvas
+      d3.selectAll(".mouse-per-line circle")
+      .style("opacity", "1");
+  
     var mouse = d3.mouse(this);
     d3.select(".mouse-line")
       .attr("d", function() {
