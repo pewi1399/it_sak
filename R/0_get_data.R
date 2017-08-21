@@ -45,6 +45,11 @@ patchdata <-
         time = time + severity * 5
         )
 
+# write sample file for it_sak
+patchdata %>% 
+  select(os, type, severity, patch_release, patch_fix, legacy) %>% 
+  openxlsx::write.xlsx(., "data/exempeldata_patchspeed.xlsx")
+
 
 get_data <- function(os){
   #---------------------------- survival functions -------------------------------
